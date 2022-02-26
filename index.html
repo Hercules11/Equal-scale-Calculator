@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        input {
+            -webkit-appearance: none;
+            background-color: #FFF;
+            background-image: none;
+            border-radius: 4px;
+            border: 1px solid #DCDFE6;
+            box-sizing: border-box;
+            color: #606266;
+            display: inline-block;
+            font-size: 24px;
+            height: 40px;
+            width: 80px;
+            line-height: 40px;
+            outline: 0;
+            transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+            margin: 5px;
+        }
+
+        button {
+            background-color: rgb(223, 215, 215);
+            background-image: none;
+            border-radius: 4px;
+            border: 1px solid #999;
+            width: 60px;
+            height: 40px;
+            font-size: 24px;
+        }
+        .copy {
+            background-color: #ddd;
+            font-size: 24px;
+            margin: 0 0 5px 5px;
+            height: 30px;
+        }
+
+        @media (min-width: 960px) {
+            input {
+                width: 160px;
+                height: 40px;
+            }
+        }
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+<h2>等比例计算器
+<svg t="1645875338369" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2527"
+    width="16" height="16">
+    <path
+        d="M512 938.666667c235.648 0 426.666667-191.018667 426.666667-426.666667S747.648 85.333333 512 85.333333 85.333333 276.352 85.333333 512s191.018667 426.666667 426.666667 426.666667z m0 85.333333C229.248 1024 0 794.752 0 512S229.248 0 512 0s512 229.248 512 512-229.248 512-512 512z"
+        fill="#3D3D3D" p-id="2528"></path>
+    <path
+        d="M520.96 232.106667c-62.293333 0-111.786667 17.92-147.626667 54.613333-36.693333 35.84-54.613333 84.48-54.613333 146.773333h90.453333c0-37.546667 7.68-67.413333 23.04-87.893333 17.066667-23.893333 45.226667-35.84 83.626667-35.84 30.72 0 54.613333 8.533333 71.68 25.6 16.213333 17.066667 24.746667 40.106667 24.746667 69.973333 0 22.186667-7.68 42.666667-23.04 62.293334l-14.506667 16.213333c-52.906667 46.933333-85.333333 81.92-97.28 105.813333-11.093333 22.186667-16.213333 49.493333-16.213333 81.066667v14.506667h91.306666v-14.506667c0-21.333333 4.266667-40.106667 13.653334-57.173333 7.68-15.36 19.626667-29.866667 34.986666-43.52 40.96-34.986667 64.853333-57.173333 72.533334-66.56 20.48-27.306667 31.573333-62.293333 31.573333-104.106667 0-51.2-17.066667-92.16-50.346667-122.026667-34.133333-30.72-78.506667-45.226667-133.973333-45.226666z m-14.506667 499.2c-17.92 0-32.426667 5.12-43.52 17.066666-12.8 11.093333-18.773333 25.6-18.773333 43.52 0 17.066667 5.973333 31.573333 18.773333 43.52 11.093333 11.946667 25.6 17.92 43.52 17.92 17.066667 0 32.426667-5.973333 45.226667-17.066666 11.946667-11.946667 17.92-26.453333 17.92-44.373334 0-17.92-5.973333-32.426667-17.92-43.52-11.946667-11.946667-27.306667-17.066667-45.226667-17.066666z"
+        fill="#3D3D3D" p-id="2529"></path>
+</svg>
+</h2>
+<p>输入数据自动完成计算, 点击加号自动新增条目</p>
+<p>新增条目的比例根据上一个条目的数据比例而来</p>
+<section id="app">
+    <div v-for="item in itemData">
+        <calculate @add-item="addCalculator"/>
+    </div>
+</section>
+</body>
+<script src="https://unpkg.com/vue@next"></script>
+<script>
+const calculate = {
+    data() {
+        return {
+            start: null,
+            proportion: null,
+            end: null,
+        }
+    },
+    props: ['rootProp'],
+    emits: ["addItem"],
+    template: `<div @keyup="autoCal"><input type="number" v-model="start" id="start"> * <input type="number" placeholder="比例" v-model="proportion" id="proportion">
+        = <input type="number" v-model="end" id="end">
+        <button @click="addItem">+</button>
+        <p class="copy">{{ this.start }}&nbsp; &nbsp;{{ this.proportion }}&nbsp;
+            &nbsp;{{ this.end }} </p>
+    </div>`,
+    methods: {
+        addItem() {
+            this.$emit('addItem')
+        },
+        autoCal(e) {
+            // debugger
+            let [first, second, last] = [this.start, this.proportion, this.end];
+            if(!first) {
+                if(second && last) {
+                    this.start = last / second;
+                    return;
+                }
+            }
+            if(!second) {
+                if(first && last) {
+                    this.proportion = last / first;
+                    sessionStorage.setItem('currentProportion', this.proportion);
+                    return;
+                }
+            }
+            if(!last) {
+                if(first && second) {
+                    this.end = first * second;
+                    return;
+                }
+            }
+            // 三值都存在时的联动
+            if(this.start && this.proportion && this.end) {
+                if(e.target.id === 'start') {
+                    this.end = this.proportion * this.start;
+                    return;
+                }
+                if(e.target.id === 'proportion') {
+                    this.end = this.proportion * this.start;
+                    sessionStorage.setItem('currentProportion', this.proportion);
+                }
+                if(e.target.id === 'end') {
+                    this.start = this.end / this.proportion;
+                }
+            }
+            if(this.start) this.start = Math.round(this.start);
+            if(this.proportion) this.proportion = Math.round(this.proportion);
+            if(this.end) this.end = Math.round(this.end);
+        }
+    },
+    created() {
+        this.proportion = sessionStorage.getItem('currentProportion')
+    },
+}
+
+const rootComponent = {
+    data() {
+        return {
+            itemData: 1,
+        }
+    },
+    methods: {
+        addCalculator() {
+            this.itemData += 1;
+            return;
+        }
+    }
+
+}
+const app = Vue.createApp(rootComponent)
+app.component('calculate', calculate)
+app.mount('#app')
+
+let tip = document.querySelector('h2>svg');
+tip.addEventListener('click', () => {
+    alert(`等比例计算器，用来计算等比例的数值对\n输入两个数据，自动求出第三个数值\n
+    `)
+})
+// 弹出框的三种方案，alert(), prompt, confirm， showModalDialog
+</script>
+
+</html>
