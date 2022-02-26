@@ -107,12 +107,14 @@ const calculate = {
             if(!first) {
                 if(second && last) {
                     this.start = last / second;
+                    if(this.start) this.start = Math.round(this.start);
                     return;
                 }
             }
             if(!second) {
                 if(first && last) {
                     this.proportion = last / first;
+                    if(this.proportion) this.proportion = Math.round(this.proportion);
                     sessionStorage.setItem('currentProportion', this.proportion);
                     return;
                 }
@@ -120,6 +122,7 @@ const calculate = {
             if(!last) {
                 if(first && second) {
                     this.end = first * second;
+                    if(this.end) this.end = Math.round(this.end);
                     return;
                 }
             }
@@ -127,19 +130,22 @@ const calculate = {
             if(this.start && this.proportion && this.end) {
                 if(e.target.id === 'start') {
                     this.end = this.proportion * this.start;
+                    if(this.end) this.end = Math.round(this.end);
                     return;
                 }
                 if(e.target.id === 'proportion') {
                     this.end = this.proportion * this.start;
+                    if(this.end) this.end = Math.round(this.end);
                     sessionStorage.setItem('currentProportion', this.proportion);
+                    return;
                 }
                 if(e.target.id === 'end') {
                     this.start = this.end / this.proportion;
+                    if(this.start) this.start = Math.round(this.start);
+                    return;
                 }
             }
-            if(this.start) this.start = Math.round(this.start);
-            if(this.proportion) this.proportion = Math.round(this.proportion);
-            if(this.end) this.end = Math.round(this.end);
+
         }
     },
     created() {
