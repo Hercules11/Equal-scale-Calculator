@@ -103,45 +103,33 @@ const calculate = {
         },
         autoCal(e) {
             // debugger
-            let [first, second, last] = [this.start, this.proportion, this.end];
-            if(!first) {
-                if(second && last) {
-                    this.start = last / second;
-                    if(this.start) this.start = Math.round(this.start);
+            if(e.target.id === 'start') {
+                if(this.proportion) {
+                    this.end = this.start * this.proportion;
+                    this.end = Math.round(this.end * 100) / 100;
                     return;
                 }
-            }
-            if(!second) {
-                if(first && last) {
-                    this.proportion = last / first;
-                    if(this.proportion) this.proportion = Math.round(this.proportion);
+                if(this.end) {
+                    this.proportion = this.end / this.start;
+                    this.proportion = Math.round(this.proportion * 100) / 100;
                     sessionStorage.setItem('currentProportion', this.proportion);
                     return;
                 }
             }
-            if(!last) {
-                if(first && second) {
-                    this.end = first * second;
-                    if(this.end) this.end = Math.round(this.end);
+            if(e.target.id === 'proportion') {
+                // change proportion
+                sessionStorage.setItem('currentProportion', this.proportion);
+                if(this.start) {
+                    this.end = this.start * this.proportion;
+                    this.end = Math.round(this.end * 100) / 100;
                     return;
                 }
             }
-            // 三值都存在时的联动
-            if(this.start && this.proportion && this.end) {
-                if(e.target.id === 'start') {
-                    this.end = this.proportion * this.start;
-                    if(this.end) this.end = Math.round(this.end);
-                    return;
-                }
-                if(e.target.id === 'proportion') {
-                    this.end = this.proportion * this.start;
-                    if(this.end) this.end = Math.round(this.end);
+            if(e.target.id === 'end') {
+                if(this.start) {
+                    this.proportion = this.end / this.start;
+                    this.proportion = Math.round(this.proportion * 100) / 100;
                     sessionStorage.setItem('currentProportion', this.proportion);
-                    return;
-                }
-                if(e.target.id === 'end') {
-                    this.start = this.end / this.proportion;
-                    if(this.start) this.start = Math.round(this.start);
                     return;
                 }
             }
